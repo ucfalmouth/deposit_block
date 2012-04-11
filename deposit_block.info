@@ -1,7 +1,7 @@
-name = Deposit Block
-description = Display block allowing researcher to add content of deposit types
-package = Repository
+name = "deposit_block"
+description = displays a block with links to create content from deposit content type group
+package = UCF Custom
 core = 7.x
 dependencies[] = block
-
+dependencies[] = nodereference_url
 
