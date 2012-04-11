@@ -25,6 +25,7 @@ function deposit_block_page() {
   $page = array(
     '#type' => 'markup',
     '#markup' => t('This module displays a block with links to create deposit content (nodes types within deposit content type group)'),
+	);
   return $page;
 }
 /**
@@ -33,19 +34,12 @@ function deposit_block_page() {
  * This hook declares what blocks are provided by the module.
  */
 function deposit_block_block_info() {
-  // This hook returns an array, each component of which is an array of block
-  // information. The array keys are the 'delta' values used in other block
-  // hooks.
-
-  // The required block information is a block description, which is shown
-  // to the site administrator in the list of possible blocks. You can also
-  // provide initial settings for block weight, status, etc.
-
   $blocks['deposit_nodes'] = array(
     // info: The name of the block.
-    'info' => t('Example: uppercase this please'),
+    'info' => t('Deposit content'),
     'status' => TRUE,
     'region' => 'sidebar_first',  // Not usually provided.
+		'pages' => 'node/*', // Not usually provided here.
   );
   return $blocks;
 }
@@ -56,10 +50,9 @@ function deposit_block_block_info() {
  * This hook generates the contents of the blocks themselves.
  */
 function deposit_block_block_view($delta = '') {
-  //The $delta parameter tells us which block is being requested.
   switch ($delta) {
     case 'deposit_nodes':
-      $block['subject'] = t('Title of first block (example_configurable_text)');
+      $block['subject'] = t('Deposit content');
       $block['content'] = deposit_block_contents($delta);
       break;
   }
@@ -76,15 +69,15 @@ function deposit_block_contents($which_block) {
       $parent = _get_deposit_parent();
       $parent = 76;
 
-      if ($parent) {
-        return array('#markup' => deposit_block_node_links($nid)));
+      if ($parent && module_exists('deposit_block_node_links')) {
+        return array('#markup' => deposit_block_node_links($nid));
       } else {
-        return array('#markup' => deposit_block_global_links()));
+        return array('#markup' => deposit_block_global_links());
       }
   }
 }
 
-// returns links that will prepopulate a node reference
+// returns links that will prepopulate a node reference (using noerference_url module)
 function deposit_block_node_links($nid) {
   $node = node_load($nid);
   $group = new ContentTypeGroup('deposit');
@@ -102,6 +95,7 @@ function deposit_block_global_links() {
   $group = new ContentTypeGroup('deposit'); // Get the content type group of the given machine name	
   $menu_items = array('<ul>');
   foreach ($group->typeList() as $key => $type) {
+		$key = str_replace('_', '-', $key);
     $menu_items[] = '<li>'. l($type, 'node/add/'.$key) .'</li>';
   }
   $menu_items[] = '</ul>';
